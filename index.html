@@ -317,7 +317,7 @@
         const SUPABASE_URL = 'https://pegosejmbaotgxhxmwuu.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBlZ29zZWptYmFvdGd4aHhtd3V1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNzg3NDQsImV4cCI6MjA4Mjc1NDc0NH0.6zbNqCBqYs_l1VPPn_rrDXTk3BWmwu5R6jSZO3LF0nA';
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // DOM 요소
         const itemInput = document.getElementById('itemInput');
@@ -376,7 +376,7 @@
         // 아이템 로드 (Supabase에서)
         async function loadItems() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('shopping_items')
                     .select('*')
                     .order('created_at', { ascending: false });
@@ -403,7 +403,7 @@
             addBtn.disabled = true;
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('shopping_items')
                     .insert([{ text, checked: false }])
                     .select()
@@ -426,7 +426,7 @@
         // 아이템 삭제
         async function deleteItem(id) {
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('shopping_items')
                     .delete()
                     .eq('id', id);
@@ -449,7 +449,7 @@
             const newChecked = !item.checked;
 
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('shopping_items')
                     .update({ checked: newChecked })
                     .eq('id', id);
@@ -471,7 +471,7 @@
             if (completedIds.length === 0) return;
 
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('shopping_items')
                     .delete()
                     .in('id', completedIds);
@@ -494,7 +494,7 @@
         clearCompleted.addEventListener('click', clearCompletedItems);
 
         // 실시간 업데이트 구독
-        supabase
+        supabaseClient
             .channel('shopping_items_changes')
             .on('postgres_changes',
                 { event: '*', schema: 'public', table: 'shopping_items' },
